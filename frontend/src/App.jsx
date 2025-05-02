@@ -1,8 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Header from './components/Header'
 import Home from './pages/Home'
-import SignIn from './components/SignIn'
-import SignUp from './components/SignUp'
 import CreateAdd from './pages/CreateAdd'
 import Search from './pages/Search'
 import PostAdd from './pages/PostAdd'
