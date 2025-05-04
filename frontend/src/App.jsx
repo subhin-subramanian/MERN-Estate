@@ -5,6 +5,8 @@ import CreateAdd from './pages/CreateAdd'
 import Search from './pages/Search'
 import PostAdd from './pages/PostAdd'
 import FooterComp from './components/FooterComp'
+import Profile from './pages/Profile'
+import PrivateRoute from './components/PrivateRoute'
 
 function App() {
   return (
@@ -15,6 +17,9 @@ function App() {
         <Route path='/create-add' element={<CreateAdd/>}/>
         <Route path='/post-add' element={<PostAdd/>}/>
         <Route path='/search' element={<Search/>}/>
+        <Route element={<PrivateRoute/>}>
+          <Route path='/profile' element={<Profile/>}/>
+        </Route>
       </Routes>
       <FooterComp/>
     </BrowserRouter>

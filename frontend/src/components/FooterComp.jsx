@@ -8,7 +8,7 @@ function FooterComp() {
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:w-full justify-between">
         <Link to={'/'}>
-          <span className='max-w-52 sm:max-w-72 text-xl sm:text-3xl font-bold flex gap-2 bg-amber-950 text-white dark:text-gray-500 whitespace-nowrap font-serif p-2 items-center rounded-full shadow-md'><span className='bg-white dark:bg-gray-500 text-black rounded-full p-2'>1</span>Cent<span className='font-semibold'><i>Property</i></span></span>
+          <span className='max-w-52 sm:max-w-72 text-xl sm:text-3xl font-bold flex gap-2 bg-amber-950 text-white whitespace-nowrap font-serif p-2 items-center rounded-full shadow-md'><span className='bg-white text-black rounded-full p-2'>1</span>Cent<span className='font-semibold'><i>Property</i></span></span>
         </Link>
         <Link to={'/post-add'}>
           <Button className='bg-gradient-to-r from-amber-600 to-amber-400'>Want to Advertise in our site -- Click Here</Button>

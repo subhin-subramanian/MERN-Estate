@@ -50,3 +50,50 @@ export const signIn = async(req,res)=>{
         res.status(500).json({success:false,message: error.errmsg || 'server error'});     
     }
 }
+
+// Function for the backend of user update
+export const update = async(req,res)=>{
+    if(req.user.id !==req.params.userId){
+        return res.status(401).json("You're not allowed to update this user");
+    }
+    req.body.password = bcryptjs.hashSync(req.body.password,10);
+    try {
+        const updatedUser = await User.findByIdAndUpdate(req.params.userId,{
+            $set:{
+                username:req.body.username,
+                email:req.body.email,
+                phone:req.body.phone,
+                password:req.body.password,
+                profilePic:req.body.profilePic
+            }
+        },{new:true});
+        const {password,...rest} = updatedUser._doc;
+        res.status(200).json(rest);
+    } catch (error) {
+        res.status(500).json({success:false,message:error.errmsg || 'server error'});
+    }
+}
+
+// Function to handle signing out from an account
+export const signOut = async(req,res)=>{
+    try {
+        res.clearCookie('access_token').status(200).json("You're signed out successfully")  
+    } catch (error) {
+        res.status(500).json({success:false,message:error.errmsg || 'server error'});
+    }
+}
+
+// Function to delete an account
+export const deleteUser = async(req,res)=>{
+    if(!req.user.isAdmin && (req.user.id != req.params.userId)){
+        return  res.status(401).json("You're not authorized to delete this user");
+    }
+    try {
+        await User.findByIdAndDelete(req.params.userId);
+        res.status(200).json('Account deleted');   
+    } catch (error) {
+        res.status(500).json({success:false,message:error.errmsg || 'server error'});      
+    }
+}
+
+

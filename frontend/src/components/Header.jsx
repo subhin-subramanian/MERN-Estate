@@ -1,12 +1,11 @@
-import { Alert, Button, Label, Modal, ModalBody, ModalHeader, Spinner, TextInput} from 'flowbite-react'
+import { Alert, Avatar, Button, Dropdown, DropdownDivider, DropdownHeader, DropdownItem, Label, Modal, ModalBody, ModalHeader, Spinner, TextInput} from 'flowbite-react'
 import { Link } from 'react-router-dom'
 import { BiSearchAlt2 } from "react-icons/bi";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { signInFailure, signInStart, signInSuccess } from '../redux/userSlice';
+import { signInFailure, signInStart, signInSuccess, signOutSuccess } from '../redux/userSlice';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { toggleTheme } from '../redux/themeSlice';
-
 
 function Header() {
 
@@ -20,11 +19,23 @@ function Header() {
   const dispatch = useDispatch();
   const {loading:signinLoading,error:signinError} = useSelector(state=>state.user);
   const {theme} = useSelector(state=>state.theme);
+  const {currentUser,status} = useSelector(state=>state.user);
 
+  // Status from profile page to show signout successfull
+  useEffect(()=>{
+    setAuthStat(status);
+    setTimeout(() => {
+      setAuthStat(null);
+      dispatch(signOutSuccess(null))
+    }, 5000);
+  },[status]);
+  
+  // Data storage for sign-up form
   const handleSignupChange = (e)=>{
     setSignupData({...signupData,[e.target.id]:e.target.value.trim()});
   }
 
+  // Data storage for sign-in form
   const handleSigninChange = (e)=>{
     setSigninData({...signinData,[e.target.id]:e.target.value.trim()});
   }
@@ -32,10 +43,10 @@ function Header() {
   // Function to handle signing up
   const handleSignup = async(e)=>{
     e.preventDefault();
-    setAuthError(null);
+    setsignupError(null);
     setLoading(true);
     if(signupData.phone.length <10){
-      setAuthError('Please enter a valid phone no.')
+      setsignupError('Please enter a valid phone no.')
     }
     try {
       const res = await fetch('/api/user/sign-up',{
@@ -45,7 +56,7 @@ function Header() {
       });
       const data = await res.json();
       if(data.success === false){
-        setAuthError(data.message);
+        setsignupError(data.message);
         return;
       }
       setLoading(false)
@@ -53,9 +64,9 @@ function Header() {
       setAuthStat('Signup Successfull, now sign-in with your details');
       setTimeout(() => {
         setAuthStat(null);
-      }, 5000);
+      }, 3000);
     } catch (error) {
-      setAuthError(error.message);
+      setsignupError(error.message);
       setLoading(false);
     }
   }
@@ -63,7 +74,7 @@ function Header() {
   // Function to handle singing in
   const handleSignin = async(e)=>{
     e.preventDefault();
-    setShowSignin(false);
+    
     dispatch(signInStart());
     try {
       const res = await fetch('/api/user/sign-in',{
@@ -81,7 +92,7 @@ function Header() {
       setAuthStat('Successfully signed in');
       setTimeout(() => {
         setAuthStat(null);
-      }, 5000);
+      }, 3000);
     } catch (error) {
       dispatch(signInFailure(error.message));
     }
@@ -90,7 +101,7 @@ function Header() {
 
   return (
     <>
-    <div className=' items-center px-4 flex flex-wrap gap-3 justify-between py-3  text-amber-800 shadow-sm dark:shadow-2xl'>
+    <div className=' items-center sm:px-10 flex flex-wrap gap-3 sm:justify-between py-3  text-amber-800 shadow-sm dark:shadow-2xl'>
 
       <Link to={'/'}>
         <span className='text-xl sm:text-3xl font-bold flex gap-2 bg-amber-950 text-white whitespace-nowrap font-serif p-2 items-center rounded-full shadow-md'><span className='bg-white text-black rounded-full p-2'>1</span>Cent<span className='font-semibold'><i>Property</i></span></span>
@@ -106,13 +117,25 @@ function Header() {
       </form>
 
       <div className="flex gap-2 items-center">
-        <button className="w-12 h-11 p-3 rounded-full bg-gradient-to-r from-amber-600 to-amber-400  text-white flex items-center justify-center  hover:opacity-85 border-none dark:bg-amber-600" pill onClick={()=>dispatch(toggleTheme())}>
-            {theme === 'light'? <FaMoon/> : <FaSun/>}
-        </button>
+        {currentUser ? 
+          <Dropdown arrowIcon={false} inline label={<Avatar alt='user' img={currentUser.  profilePic} rounded/>} className='border-amber-600'>
+            <DropdownHeader><span>{currentUser.username}</span></DropdownHeader>
+            <DropdownDivider className='bg-gray-300'/>
+            <Link to={'/profile'}>
+              <DropdownItem className='font-semibold'>Profile</DropdownItem>
+            </Link>
+            <DropdownItem className='font-semibold'>Sign Out</DropdownItem>
+          </Dropdown>
+          : <Button className='dark:text-white' outline onClick={()=>setShowSignin(true)}>Sign In</Button>}
+
         <Link to={'/post-add'}>
-          <Button className='bg-gradient-to-r from-amber-600 to-amber-400 hover:opacity-85'>Post Add</Button>
+          <Button className='bg-gradient-to-r from-amber-600 to-amber-400 hover:opacity-85'>Create Your Add</Button>
         </Link>
-        <Button className='dark:text-white' outline onClick={()=>setShowSignin(true)}>Sign In</Button>
+        
+        <button className="w-12 h-11 p-3 rounded-full bg-gradient-to-r from-amber-600 to-amber-400  text-white flex items-center justify-center  hover:opacity-85 border-none dark:bg-amber-600" onClick={()=>dispatch(toggleTheme())}>
+          {theme === 'light'? <FaMoon/> : <FaSun/>}
+        </button>
+
       </div>
     </div>
 
