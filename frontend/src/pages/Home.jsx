@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import bg from '../assets/bg.jpg';
 import { Alert, Spinner } from 'flowbite-react';
-import AdCard from '../components/adCard';
+import AdCard from '../components/AdCard';
 
 
 function Home() {
