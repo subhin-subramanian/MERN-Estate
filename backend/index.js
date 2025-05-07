@@ -7,6 +7,7 @@ import path, { dirname } from 'path';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import uploadRouter from './routes/upload.route.js';
+import addsRouter from './routes/adds.route.js';
 
 const app = express();
 
@@ -33,3 +34,4 @@ app.listen(3000,()=>{
 // Api endpoints
 app.use('/api/user',userRouter);
 app.use('/api/upload',uploadRouter);
+app.use('/api/adds',addsRouter);

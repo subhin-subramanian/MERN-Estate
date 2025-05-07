@@ -3,7 +3,7 @@ import { Alert, Button, Modal, ModalBody, ModalHeader, Spinner, TextInput } from
 import { useRef, useState } from 'react';
 import { useSelector,useDispatch } from 'react-redux'
 import { deleteUserFailure, deleteUserStart, deleteUserSuccess, signOutFailure, signOutStart, signOutSuccess, updateFailure, updateStart, updateSuccess } from '../redux/userSlice';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 function Profile() {
@@ -37,6 +37,8 @@ function Profile() {
             const data = await res.json();
             if(data.imageUrl){
                 setFormdata({...formdata,profilePic:data.imageUrl});
+                console.log(formdata);
+                
             }
         } catch (error) {
             setImageError('Upload failed' +error);
@@ -73,13 +75,13 @@ function Profile() {
     const handleSignOut = async()=>{
       dispatch(signOutStart());
       try {
-        const res = await fetch('api/user/sign-out',{method:'POST'});
+        const res = await fetch('/api/user/sign-out',{method:'POST'});
         const data = await res.json();
         if(!res.ok){
           return dispatch(signOutFailure(data));
         }
         dispatch(signOutSuccess(data));      
-        navigate('/');
+        navigate('/',{state:{message:"You're signed out successfully"}});
       } catch (error) {
         dispatch(signOutFailure(error)); 
       }
@@ -97,7 +99,7 @@ function Profile() {
           return;
         }
         dispatch(deleteUserSuccess(data));
-        navigate('/');
+        navigate('/',{state:{message:"Your account has been deleted"}});
       } catch (error) {
         dispatch(deleteUserFailure(error.message));
       }
@@ -120,19 +122,29 @@ function Profile() {
         {error && <Alert color='failure' className='mt-5'>{error.message}</Alert>}
 
         <Button className='w-40 mx-auto bg-gradient-to-r from-amber-800 to-amber-300 hover:opacity-85' onClick={()=>fileRef.current.click()}>Change Image</Button>
+
         <TextInput type='text' defaultValue={formdata.username} placeholder='username' id='username' required onChange={handleChange}/>
         <TextInput type='email' defaultValue={formdata.email} placeholder='email' id='email' required onChange={handleChange} />
         <TextInput type='number' defaultValue={formdata.phone} placeholder='number' id='number' required onChange={handleChange}/>
         <TextInput type='password' placeholder='password' id='password' required onChange={handleChange}/>
+
         <Button className='bg-gradient-to-r from-amber-300 to-amber-800 hover:opacity-85' type='submit'>
-          {loading ? <><Spinner size='sm'/><span>Loading...</span></> : 'Update'}</Button>
-          
+          {loading ? <><Spinner size='sm'/><span>Loading...</span></> : 'Update'}</Button>    
       </form>
 
       <div className="text-red-600 flex justify-center gap-55 mt-2 text-sm font-semibold dark:text-red-300">
         <span className='cursor-pointer' onClick={()=>setShowModal(true)}>Delete Account?</span>
         <span className='cursor-pointer' onClick={handleSignOut}>Sign Out</span>
       </div>
+
+      {currentUser.isAdmin && (
+        <div>
+          <Link to={'/post-add'}>
+           <Button className='w-full my-3 border-amber-950 text-amber-950 hover:bg-white hover:text-amber-950 hover:border-amber-950 hover:opacity-80' outline>Post New Add</Button>
+          </Link>
+          <Button className='w-full bg-gradient-to-r from-amber-300 to-amber-800 hover:opacity-85'>See all Adds</Button>
+        </div>
+      )}
 
     </div>
     

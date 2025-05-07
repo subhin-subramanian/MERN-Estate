@@ -1,9 +1,9 @@
 import { Alert, Avatar, Button, Dropdown, DropdownDivider, DropdownHeader, DropdownItem, Label, Modal, ModalBody, ModalHeader, Spinner, TextInput} from 'flowbite-react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { BiSearchAlt2 } from "react-icons/bi";
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { signInFailure, signInStart, signInSuccess, signOutSuccess } from '../redux/userSlice';
+import { signInFailure, signInStart, signInSuccess, signOutFailure, signOutStart, signOutSuccess } from '../redux/userSlice';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { toggleTheme } from '../redux/themeSlice';
 
@@ -17,18 +17,17 @@ function Header() {
   const [loading,setLoading] = useState(false);
   const [authStat,setAuthStat] = useState(null);
   const dispatch = useDispatch();
-  const {loading:signinLoading,error:signinError} = useSelector(state=>state.user);
   const {theme} = useSelector(state=>state.theme);
-  const {currentUser,status} = useSelector(state=>state.user);
+  const {currentUser,loading:signinLoading,error:signinError} = useSelector(state=>state.user);
+  const location = useLocation();
 
-  // Status from profile page to show signout successfull
+  // Useeffect to show success alert on signout and delete account from profile page
   useEffect(()=>{
-    setAuthStat(status);
-    setTimeout(() => {
-      setAuthStat(null);
-      dispatch(signOutSuccess(null))
-    }, 5000);
-  },[status]);
+    if(location.state?.message){
+      setAuthStat(location.state.message);
+      setTimeout(() => {setAuthStat(null)}, 5000);
+    }
+  },[location.state])
   
   // Data storage for sign-up form
   const handleSignupChange = (e)=>{
@@ -64,7 +63,7 @@ function Header() {
       setAuthStat('Signup Successfull, now sign-in with your details');
       setTimeout(() => {
         setAuthStat(null);
-      }, 3000);
+      }, 5000);
     } catch (error) {
       setsignupError(error.message);
       setLoading(false);
@@ -74,7 +73,6 @@ function Header() {
   // Function to handle singing in
   const handleSignin = async(e)=>{
     e.preventDefault();
-    
     dispatch(signInStart());
     try {
       const res = await fetch('/api/user/sign-in',{
@@ -84,7 +82,7 @@ function Header() {
       });
       const data = await res.json();
       if(!res.ok){
-        dispatch(signInFailure(data));
+        dispatch(signInFailure(data.message));
         return;
       }
       dispatch(signInSuccess(data.rest));
@@ -92,22 +90,40 @@ function Header() {
       setAuthStat('Successfully signed in');
       setTimeout(() => {
         setAuthStat(null);
-      }, 3000);
+      }, 5000);
     } catch (error) {
       dispatch(signInFailure(error.message));
     }
   }
 
+  // Function to handle signing out from an account
+  const handleSignOut = async()=>{
+    dispatch(signOutStart());
+    try {
+      const res = await fetch('/api/user/sign-out',{method:'POST'});
+      const data = await res.json();
+      if(!res.ok){
+        return dispatch(signOutFailure(data));
+      }
+      dispatch(signOutSuccess(data));
+      setAuthStat("You're signed out");
+      setTimeout(() => {
+        setAuthStat(null);
+      }, 5000);      
+    } catch (error) {
+      dispatch(signOutFailure(error)); 
+    }
+  }
 
   return (
     <>
-    <div className=' items-center sm:px-10 flex flex-wrap gap-3 sm:justify-between py-3  text-amber-800 shadow-sm dark:shadow-2xl'>
+    <div className=' items-center px-2 sm:px-10 flex flex-wrap gap-3 sm:justify-between py-3  text-amber-800 shadow-sm dark:shadow-2xl'>
 
       <Link to={'/'}>
         <span className='text-xl sm:text-3xl font-bold flex gap-2 bg-amber-950 text-white whitespace-nowrap font-serif p-2 items-center rounded-full shadow-md'><span className='bg-white text-black rounded-full p-2'>1</span>Cent<span className='font-semibold'><i>Property</i></span></span>
       </Link>
 
-      <form className='className="mt-5 mx-auto order-2 md:mt-0 md:order-0 flex relative w-full md:max-w-96 max-w-4xl'>
+      <form className='className="mt-5 mx-auto order-2 md:mt-0 md:order-0 flex relative w-full md:max-w-96 max-w-4xl shadow-lg'>
         <input
         type="text"
         id="search"
@@ -124,15 +140,15 @@ function Header() {
             <Link to={'/profile'}>
               <DropdownItem className='font-semibold'>Profile</DropdownItem>
             </Link>
-            <DropdownItem className='font-semibold'>Sign Out</DropdownItem>
+            <DropdownItem className='font-semibold' onClick={handleSignOut}>Sign Out</DropdownItem>
           </Dropdown>
           : <Button className='dark:text-white' outline onClick={()=>setShowSignin(true)}>Sign In</Button>}
 
-        <Link to={'/post-add'}>
-          <Button className='bg-gradient-to-r from-amber-600 to-amber-400 hover:opacity-85'>Create Your Add</Button>
+        <Link to={'/create-add'}>
+          <Button className='bg-gradient-to-r from-amber-600 to-amber-400 hover:opacity-85 border-none shadow-lg' >Create Your Add</Button>
         </Link>
         
-        <button className="w-12 h-11 p-3 rounded-full bg-gradient-to-r from-amber-600 to-amber-400  text-white flex items-center justify-center  hover:opacity-85 border-none dark:bg-amber-600" onClick={()=>dispatch(toggleTheme())}>
+        <button className="w-10 h-10 p-3 rounded-full bg-gradient-to-r from-amber-600 to-amber-400  text-white flex items-center justify-center  hover:opacity-85 border-none dark:bg-amber-600 shadow-lg" onClick={()=>dispatch(toggleTheme())}>
           {theme === 'light'? <FaMoon/> : <FaSun/>}
         </button>
 
@@ -199,7 +215,7 @@ function Header() {
           <span className='text-sm font-semibold'>Don't have an account.</span>
           <span className='text-blue-700 cursor-pointer font-semibold hover:underline' onClick={()=>{setShowSignup(true);setShowSignin(false)}}>Create-Account</span>
         </div>
-        {signinError && <Alert className='py-3' color='failure'>{signinError}</Alert>}
+        {signinError && <Alert className='py-3' color='failure'>{signinError.message}</Alert>}
       </ModalBody>
     </Modal>
 
