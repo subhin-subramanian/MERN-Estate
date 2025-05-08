@@ -1,6 +1,6 @@
 import React from 'react'
 
-function addCard() {
+function EditAd() {
   return (
     <div>
       
@@ -8,4 +8,4 @@ function addCard() {
   )
 }
 
-export default addCard
+export default EditAd

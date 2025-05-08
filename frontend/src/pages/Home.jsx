@@ -10,12 +10,12 @@ function Home() {
   const [adsError,setAdsError] = useState(null);
   const [loading,setLoading] = useState(false);
   const [showMore,setShowMore] = useState(false);
-
+  
   useEffect(()=>{
     const fetchAds = async()=>{
       setAdsError(null);
       try {
-        const res = await (type ? fetch(`/api/adds/getads?limit=9&type=${type}`) : fetch(`/api/adds/getads?limit=8`));
+        const res = await fetch(`/api/adds/getads?limit=9&type=${type}`);
         const data = await res.json();
         if(!res.ok){
           setAdsError(data.message);
@@ -30,7 +30,7 @@ function Home() {
       }
     }
     fetchAds();
-  },[])
+  },[type])
 
   // Function to fetch more posts onclicking show more 
   const handleShowMore = async()=>{
@@ -71,14 +71,12 @@ function Home() {
       {adsError && <Alert className='flex justify-center items-center' color='failure'>{adsError}</Alert>}
       {loading && <Spinner className='flex justify-center items-center' size='lg'/>}
 
-      <div className="">
-        <AdCard/>
-     
-
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-items-center gap-6">
+        {ads.map(ad=>(<AdCard key={ad._id} ad={ad}/>))}
       </div>
 
+      {showMore && <button onClick={handleShowMore} className="hover:underline flex mx-auto py-3 font-semibold cursor-pointer">Show More</button>}
 
-     
     </div>
   )
 }

@@ -5,7 +5,7 @@ function ThemeProvider({children}) {
     const {theme} = useSelector(state=>state.theme);
   return (
     <div className={theme}>
-        <div className="min-h-screen bg-white text-amber-950 dark:bg-amber-900 dark:text-amber-600">
+        <div className="min-h-screen bg-white text-amber-950 dark:bg-amber-900 dark:text-amber-200">
           {children}
         </div>
     </div>

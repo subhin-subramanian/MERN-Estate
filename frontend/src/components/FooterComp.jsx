@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 function FooterComp() {
   return (
-    <Footer container className='border-t-2 border-amber-400 flex flex-col'>
+    <Footer container className='border-t-2 border-amber-400 flex flex-col mt-10'>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:w-full  mx-auto items-center sm:justify-between ">
         <Link to={'/'}>

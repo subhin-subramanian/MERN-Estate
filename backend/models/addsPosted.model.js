@@ -38,6 +38,10 @@ const addsPostedSchema = new mongoose.Schema({
     coverImg:{
         type:String,
         required:true
+    },
+    phone:{
+        type:Number,
+        required:true
     }
 },{timestamps:true});
 

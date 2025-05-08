@@ -25,3 +25,38 @@ export const addPost = async(req,res)=>{
         res.status(500).json({success:false,message: error.errmsg || 'server error'});
     }
 }
+
+// Function to get all the ads from database as per the search or for renderings
+export const getAds = async(req,res)=>{
+    try {
+      const startIndex = parseInt(req.query.startIndex) || 0;
+      const limit = parseInt(req.query.limit) || 9;
+      const sortDirection = req.query.order === 'asc'?1:-1;
+      const ads = await addsPosted.find({
+        ...(req.query.userId && {userId:req.query.userId}),
+        ...(req.query.type && {type:req.query.type}),
+        ...(req.query.bed && {bed:req.query.bed}),
+        ...(req.query.searchTerm && {
+            $or:[
+                {title:{$regex:req.query.searchTerm,$options:'i'}},
+                {content:{$regex:req.query.searchTerm,$options:'i'}}
+            ]
+        })
+      }).sort({updatedAt:sortDirection}).skip(startIndex).limit(limit);
+
+      const totalAds = await addsPosted.countDocuments();
+      res.status(200).json({ads,totalAds});
+    } catch (error) {
+        res.status(500).json({success:false,message: error.errmsg || 'server error'});   
+    }
+}
+
+// Function to get an ad for the ad page
+export const getAd = async(req,res)=>{
+    try {
+        const ad = await addsPosted.findById(req.params.adId);
+        res.status(200).json(ad);
+    } catch (error) {
+        res.status(500).json({success:false,message: error.errmsg || 'server error'});   
+    }
+}

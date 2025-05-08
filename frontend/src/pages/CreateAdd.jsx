@@ -88,8 +88,8 @@ function CreateAdd() {
 
           {/* Left Part */}
           <div className="flex flex-col w-md sm:w-xl gap-5">
-            <Textarea placeholder='Type the address of the property here' id='address' required className='h-52' maxLength='300' onChange={handleChange}/>
-            <Textarea placeholder='Write a description for your property here' id='description' required className='h-44' maxLength='300' onChange={handleChange}/>
+            <Textarea placeholder='Type the address of the property here' id='address' required className='h-38' maxLength='300' onChange={handleChange}/>
+            <Textarea placeholder='Write a description for your property here' id='description' required className='h-32' maxLength='300' onChange={handleChange}/>
             <div className="flex gap-7 items-center">
               <div className="flex gap-2">
                 <Radio id='sale' name='type' value='sale' checked={formdata.type === 'sale'} onChange={handlePropertyType}/>
@@ -100,6 +100,10 @@ function CreateAdd() {
                 <Label htmlFor='rent'>For rent</Label>
               </div>
               <TextInput className='flex-1' type='number' placeholder='Monthly rent in Rs' required onChange={handlePropertyCost}/>
+            </div>
+            <div>
+              <Label>Contact Phone Number</Label>
+              <TextInput type='number' placeholder='Enter your contact phone no.' required onChange={handleChange}/>
             </div>
           </div>
 

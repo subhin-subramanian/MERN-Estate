@@ -68,7 +68,7 @@ function PostAdd() {
         return setFormError(data.message);
       }
       setLoading(false);
-      // navigate('/',{state:{message:"New add created"}});
+      navigate('/',{state:{message:"New add created"}});
     } catch (error) {
       setFormError(error.message);
       setLoading(false);
@@ -87,9 +87,12 @@ function PostAdd() {
             {/* Left Part */}
             <div className="flex flex-col w-md sm:w-xl gap-5 mt-2">
               <TextInput placeholder='userId' required id='userId' onChange={handleChange}/>
-              <Textarea placeholder='Type the address of the property here' id='address' required className='h-52' maxLength='300' onChange={handleChange}/>
-              <Textarea placeholder='Write a description for your property here' id='description' required className='h-44' maxLength='300' onChange={handleChange}/>
-              
+              <Textarea placeholder='Type the address of the property here' id='address' required className='h-44' maxLength='300' onChange={handleChange}/>
+              <Textarea placeholder='Write a description for your property here' id='description' required className='h-38' maxLength='300' onChange={handleChange}/>
+              <div>
+                <Label>Contact Phone Number</Label>
+                <TextInput type='number' placeholder='Enter your contact phone no.' required onChange={handleChange}/>
+              </div>
             </div>
   
             {/* Right Part */}
@@ -104,7 +107,7 @@ function PostAdd() {
                     <Radio id='rent' name='type' value='rent' checked={formdata.type === 'rent'} onChange={handlePropertyType} />
                     <Label htmlFor='rent'>For rent</Label>
                   </div>
-                  <TextInput className='flex-1' type='number' placeholder='Monthly rent in Rs' required onChange={handlePropertyCost}/>
+                  <TextInput className='flex-1' type='number' placeholder={formdata.type === 'sale' ? "Selling Price in Rs" : 'Monthly rent in Rs'} required onChange={handlePropertyCost}/>
                 </div>
   
               <div className="flex gap-2 sm:gap-4">

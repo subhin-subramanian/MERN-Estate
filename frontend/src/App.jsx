@@ -7,6 +7,8 @@ import PostAdd from './pages/PostAdd'
 import FooterComp from './components/FooterComp'
 import Profile from './pages/Profile'
 import PrivateRoute from './components/PrivateRoute'
+import Ad from './pages/Ad'
+import EditAd from './pages/EditAd'
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
         <Route element={<PrivateRoute/>}>
           <Route path='/profile' element={<Profile/>}/>
         </Route>
+        <Route path='/ad/:adId' element={<Ad/>}/>
+        <Route path='/edit-ad/:adId' element={<EditAd/>}/>
       </Routes>
       <FooterComp/>
     </BrowserRouter>

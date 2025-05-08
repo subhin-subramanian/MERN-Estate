@@ -1,10 +1,11 @@
 
 import { Alert, Button, Modal, ModalBody, ModalHeader, Spinner, TextInput } from 'flowbite-react';
-import { useRef, useState } from 'react';
+import { useRef, useState,useEffect } from 'react';
 import { useSelector,useDispatch } from 'react-redux'
 import { deleteUserFailure, deleteUserStart, deleteUserSuccess, signOutFailure, signOutStart, signOutSuccess, updateFailure, updateStart, updateSuccess } from '../redux/userSlice';
 import { Link, useNavigate } from 'react-router-dom';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import { FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
 
 function Profile() {
     const {currentUser,error,loading} = useSelector(state=>state.user);
@@ -15,6 +16,8 @@ function Profile() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [showModal,setShowModal] = useState(false);
+    const [ads,setAds] = useState([]);
+    const [adsError,setAdsError] =  useState(null);
 
     // Function to store formdata
     const handleChange = (e)=>{
@@ -104,9 +107,36 @@ function Profile() {
         dispatch(deleteUserFailure(error.message));
       }
     }
+  
+  // Function to get all ads to display for admin
+  useEffect(()=>{
+    const fetchAds = async()=>{
+      setAdsError(null);
+      try {
+        const res = await fetch(`/api/adds/getads`);
+        const data = await res.json();
+        if(!res.ok){
+          setAdsError(data.message);
+          return;
+        } 
+        setAds(data.ads);
+      } catch (error) {
+        setAdsError(error.message);        
+      }
+    }
+    if(currentUser && currentUser.isAdmin){
+      fetchAds();
+    }
+  },[currentUser])
+
+  // Function to delete an ad
+  const handleAdDelete = async()=>{
+
+
+  }
 
   return (
-    <>
+    <div className=''>
     <div className='py-10 mx-auto max-w-sm w-full'>
 
       <h1 className='text-3xl font-semibold font-serif tracking-wider text-center'>Profile</h1>
@@ -138,33 +168,56 @@ function Profile() {
       </div>
 
       {currentUser.isAdmin && (
-        <div>
-          <Link to={'/post-add'}>
-           <Button className='w-full my-3 border-amber-950 text-amber-950 hover:bg-white hover:text-amber-950 hover:border-amber-950 hover:opacity-80' outline>Post New Add</Button>
-          </Link>
-          <Button className='w-full bg-gradient-to-r from-amber-300 to-amber-800 hover:opacity-85'>See all Adds</Button>
-        </div>
+        <>
+          <div>
+            <Link to={'/post-add'}>
+            <Button className='w-full my-3 border-amber-950 text-amber-950 hover:bg-white hover:text-amber-950 hover:border-amber-950 hover:opacity-80' outline>Post New Add</Button>
+            </Link>
+          </div>
+        </>
       )}
-
     </div>
+
+    {/* Ads rendering for admin */}
+    {currentUser.isAdmin && (
+      <>
+      {adsError && <Alert color='failure' className='mt-3'>{adsError}</Alert>}
+        <h1 className='text-center text-2xl font-bold text-amber-600 mt-10'>Posted Adds</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 m-5 p-5 gap-8">
+          {ads.map(ad=>(
+            <div key={ad._id} className="flex flex-row gap-10 p-3 border-2 border-amber-600 items-center rounded-md">
+              <img src={ad.coverImg} alt="image" className='h-25 w-40 rounded-md'/>
+              <div className="flex flex-col gap-3">
+                <span className='flex gap-2 items-center'><FaMapMarkerAlt/><p className="text-sm line-clamp-1">{ad.address}</p></span>
+                <span className='text-sm flex gap-2 items-center'><FaPhone/><p className="text-sm font-semibold">{ad.phone}</p></span>
+                <span className='font-semibold bg-amber-800 text-white px-3 py-1 rounded-4xl w-22'>For {ad.type}</span>
+              </div>
+              <div className="flex flex-col gap-3 mr-3">
+                <Link to={`/edit-ad/${ad._id}`}><Button color='yellow'>Edit</Button></Link>
+                <Button color='red' onClick={handleAdDelete}>Delete</Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </>)}
     
     {/* Modal for deleting user */}
-  <Modal show={showModal} onClose={()=>setShowModal(false)} popup size='md'>
-  <ModalHeader >
-    <ModalBody className='text-amber-950'>
-      <div className="text-center">
-        <HiOutlineExclamationCircle className="h-14 w-14 mb-4 mx-auto"/>
-        <h3 className="mb-5 text-lg ">Are you sure you want to delete the account?</h3>
-        <div className="flex justify-center gap-5">
-          <Button color='alternative' className='hover:text-amber-950 hover:opacity-80' onClick={handleDelete}>Yes I'm sure</Button>
-          <Button className='bg-amber-600 hover:bg-amber-600 hover:opacity-80' onClick={()=>setShowModal(false)}>No I'm not</Button>
+    <Modal show={showModal} onClose={()=>setShowModal(false)} popup size='md'>
+    <ModalHeader >
+      <ModalBody className='text-amber-950'>
+        <div className="text-center">
+          <HiOutlineExclamationCircle className="h-14 w-14 mb-4 mx-auto"/>
+          <h3 className="mb-5 text-lg ">Are you sure you want to delete the account?</h3>
+          <div className="flex justify-center gap-5">
+            <Button color='alternative' className='hover:text-amber-950 hover:opacity-80' onClick={handleDelete}>Yes I'm sure</Button>
+            <Button className='bg-amber-600 hover:bg-amber-600 hover:opacity-80' onClick={()=>setShowModal(false)}>No I'm not</Button>
+          </div>
         </div>
-      </div>
-    </ModalBody>
+      </ModalBody>
     </ModalHeader>
-  </Modal>
+    </Modal>
 
-  </>
+  </div>
   )
 }
 export default Profile
