@@ -18,6 +18,7 @@ function Profile() {
     const [showModal,setShowModal] = useState(false);
     const [ads,setAds] = useState([]);
     const [adsError,setAdsError] =  useState(null);
+    const [adDeleteErr,setAdDeleteErr] = useState(null);
 
     // Function to store formdata
     const handleChange = (e)=>{
@@ -130,9 +131,18 @@ function Profile() {
   },[currentUser])
 
   // Function to delete an ad
-  const handleAdDelete = async()=>{
-
-
+  const handleAdDelete = async(adId)=>{
+    setAdDeleteErr(null);
+    try {
+      const res = await fetch(`/api/adds/delete/${adId}`,{method:'DELETE'});
+      const data = await res.json();
+      if(!res.ok){
+        setAdDeleteErr(data.message);
+      }
+      console.log(data);
+    } catch (error) {
+      setAdDeleteErr(error.message);
+    }
   }
 
   return (
@@ -183,10 +193,13 @@ function Profile() {
       <>
       {adsError && <Alert color='failure' className='mt-3'>{adsError}</Alert>}
         <h1 className='text-center text-2xl font-bold text-amber-600 mt-10'>Posted Adds</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 m-5 p-5 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 m-5 p-5 gap-8 ">
           {ads.map(ad=>(
-            <div key={ad._id} className="flex flex-row gap-10 p-3 border-2 border-amber-600 items-center rounded-md">
-              <img src={ad.coverImg} alt="image" className='h-25 w-40 rounded-md'/>
+            
+            <div key={ad._id}  className="flex flex-row gap-10 p-3 border-2 border-amber-600 items-center rounded-md">
+              <Link  to={`/ad/${ad._id}`} as='div'>
+                <img src={ad.coverImg} alt="image" className='h-25 w-40 rounded-md'/>
+              </Link>
               <div className="flex flex-col gap-3">
                 <span className='flex gap-2 items-center'><FaMapMarkerAlt/><p className="text-sm line-clamp-1">{ad.address}</p></span>
                 <span className='text-sm flex gap-2 items-center'><FaPhone/><p className="text-sm font-semibold">{ad.phone}</p></span>
@@ -194,7 +207,7 @@ function Profile() {
               </div>
               <div className="flex flex-col gap-3 mr-3">
                 <Link to={`/edit-ad/${ad._id}`}><Button color='yellow'>Edit</Button></Link>
-                <Button color='red' onClick={handleAdDelete}>Delete</Button>
+                <Button color='red' onClick={()=>handleAdDelete(ad._id)}>Delete</Button>
               </div>
             </div>
           ))}

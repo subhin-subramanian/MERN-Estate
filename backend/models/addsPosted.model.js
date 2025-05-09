@@ -42,6 +42,10 @@ const addsPostedSchema = new mongoose.Schema({
     phone:{
         type:Number,
         required:true
+    },
+    userId:{
+        type:String,
+        required:true
     }
 },{timestamps:true});
 

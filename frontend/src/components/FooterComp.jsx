@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 function FooterComp() {
   return (
-    <Footer container className='border-t-2 border-amber-400 flex flex-col mt-10'>
+    <Footer container className='border-t-2 border-amber-400 flex flex-col '>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:w-full  mx-auto items-center sm:justify-between ">
         <Link to={'/'}>
@@ -33,7 +33,6 @@ function FooterComp() {
         </FooterLinkGroup>
       </div>
       
-      <FooterDivider/>
 
       <FooterCopyright  href='#' by="1 Cent Property" year={new Date().getFullYear()} className='flex justify-center'/>
 

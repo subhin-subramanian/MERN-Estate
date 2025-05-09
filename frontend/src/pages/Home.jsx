@@ -54,7 +54,7 @@ function Home() {
   }
 
   return (
-    <div className="">
+    <div className="mb-10">
       {/* Home Wallpaper */}
       <div className="relative w-full h-[80vh]">
         <img src={bg} alt="coverImage" className='w-full h-full object-cover'/>

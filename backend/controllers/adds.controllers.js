@@ -60,3 +60,29 @@ export const getAd = async(req,res)=>{
         res.status(500).json({success:false,message: error.errmsg || 'server error'});   
     }
 }
+
+// Function to delete an ad
+export const deleteAd = async(req,res)=>{
+    if(!req.user.isAdmin){
+        return  res.status(401).json("You're not authorized to delete this ad");
+    }
+    try {
+        await addsPosted.findByIdAndDelete(req.params.adId);
+        res.status(200).json('Ad deleted');   
+    } catch (error) {
+        res.status(500).json({success:false,message:error.errmsg || 'server error'});      
+    }
+}
+
+// Function to edit an ad
+export const editAd = async(req,res)=>{
+    if(!req.user.isAdmin){
+        return  res.status(401).json("You're not authorized to edit this ad");
+    }
+    try {
+        await addsPosted.findByIdAndUpdate(req.params.adId,{$set:req.body},{new:true})
+        res.status(200).json('Ad edited');  
+    } catch (error) {
+        res.status(500).json({success:false,message:error.errmsg || 'server error'});
+    }
+}

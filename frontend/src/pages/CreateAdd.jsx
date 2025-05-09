@@ -58,6 +58,9 @@ function CreateAdd() {
     event.preventDefault();
     setFormError(null);
     setLoading(true);
+    if(!formdata.coverImg){
+      return setFormError('Please upload an image');
+    }
     try {
       const res = await fetch(`/api/adds/add-request`,{
         method:'POST',
@@ -99,11 +102,11 @@ function CreateAdd() {
                 <Radio id='rent' name='type' value='rent' checked={formdata.type === 'rent'} onChange={handlePropertyType} />
                 <Label htmlFor='rent'>For rent</Label>
               </div>
-              <TextInput className='flex-1' type='number' placeholder='Monthly rent in Rs' required onChange={handlePropertyCost}/>
+              <TextInput className='flex-1' type='number' placeholder={formdata.type === 'sale' ? "Selling Price in Rs" : 'Monthly rent in Rs'} required onChange={handlePropertyCost}/>
             </div>
             <div>
               <Label>Contact Phone Number</Label>
-              <TextInput type='number' placeholder='Enter your contact phone no.' required onChange={handleChange}/>
+              <TextInput type='number' id='phone' placeholder='Enter your contact phone no.' required onChange={handleChange}/>
             </div>
           </div>
 

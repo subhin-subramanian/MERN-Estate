@@ -50,7 +50,7 @@ function AdCard({ad}) {
         </div>
 
         <div className="flex items-center gap-2">
-          <FaPhone/><span className="text-sm font-semibold"></span>
+          <FaPhone/><span className="text-sm font-semibold">{ad.phone}</span>
         </div>
 
       </div>

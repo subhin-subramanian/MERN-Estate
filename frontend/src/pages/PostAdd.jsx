@@ -57,6 +57,9 @@ function PostAdd() {
     event.preventDefault();
     setFormError(null);
     setLoading(true);
+    if(!formdata.coverImg){
+      return setFormError('Please upload an image')
+    }
     try {
       const res = await fetch(`/api/adds/post-add`,{
         method:'POST',
@@ -91,7 +94,7 @@ function PostAdd() {
               <Textarea placeholder='Write a description for your property here' id='description' required className='h-38' maxLength='300' onChange={handleChange}/>
               <div>
                 <Label>Contact Phone Number</Label>
-                <TextInput type='number' placeholder='Enter your contact phone no.' required onChange={handleChange}/>
+                <TextInput type='number' id='phone' placeholder='Enter your contact phone no.' required onChange={handleChange}/>
               </div>
             </div>
   
