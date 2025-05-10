@@ -1,5 +1,5 @@
 import { Alert, Avatar, Button, Dropdown, DropdownDivider, DropdownHeader, DropdownItem, Label, Modal, ModalBody, ModalHeader, Spinner, TextInput} from 'flowbite-react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { BiSearchAlt2 } from "react-icons/bi";
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,6 +20,8 @@ function Header() {
   const {theme} = useSelector(state=>state.theme);
   const {currentUser,loading:signinLoading,error:signinError} = useSelector(state=>state.user);
   const location = useLocation();
+  const [searchTerm,setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
   // Useeffect to show success alert on signout and delete account from profile page
   useEffect(()=>{
@@ -115,6 +117,22 @@ function Header() {
     }
   }
 
+  // Useeffect to get the searchterm
+  useEffect(()=>{
+    const urlParams = new URLSearchParams(location.search);
+    const searchTermUrl = urlParams.get('searchTerm');
+    setSearchTerm(searchTermUrl);
+  },[location.search]);
+
+  // Function to handle search submit
+  const handleSearchSubmit = async(e)=>{
+    e.preventDefault();
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set('searchTerm',searchTerm);
+    const queryUrl = urlParams.toString();
+    navigate(`/search?${queryUrl}`)
+  }
+
   return (
     <>
     <div className=' items-center px-2 sm:px-10 flex flex-wrap gap-3 sm:justify-between py-3  text-amber-800 shadow-sm dark:shadow-2xl'>
@@ -123,13 +141,17 @@ function Header() {
         <span className='text-xl sm:text-3xl font-bold flex gap-2 bg-amber-950 text-white whitespace-nowrap font-serif p-2 items-center rounded-full shadow-md'><span className='bg-white text-black rounded-full p-2'>1</span>Cent<span className='font-semibold'><i>Property</i></span></span>
       </Link>
 
-      <form className='className="mt-5 mx-auto order-2 md:mt-0 md:order-0 flex relative w-full md:max-w-96 max-w-4xl shadow-lg'>
+      <form className='className="mt-5 mx-auto order-2 md:mt-0 md:order-0 flex relative w-full md:max-w-96 max-w-4xl shadow-lg' onSubmit={handleSearchSubmit}>
         <input
         type="text"
         id="search"
         className="block w-full rounded-lg border border-gray-300 bg-gray-50 dark:bg-gray-200 p-2.5 text-sm text-gray-900 "
+        defaultValue={searchTerm}
+        onChange={(e)=>setSearchTerm(e.target.value)}
         placeholder="Search here..." />
-        <BiSearchAlt2 className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none'/>     
+        <button type='submit'>
+         <BiSearchAlt2 className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-500  cursor-pointer'/>     
+        </button>
       </form>
 
       <div className="flex gap-2 items-center">

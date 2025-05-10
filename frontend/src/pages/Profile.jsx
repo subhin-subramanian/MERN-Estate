@@ -198,7 +198,9 @@ function Profile() {
             
             <div key={ad._id}  className="flex flex-row gap-10 p-3 border-2 border-amber-600 items-center rounded-md">
               <Link  to={`/ad/${ad._id}`} as='div'>
-                <img src={ad.coverImg} alt="image" className='h-25 w-40 rounded-md'/>
+                <div className="h-25 w-40">
+                  <img src={ad.coverImg} alt="image" className='w-full h-full rounded-md'/>
+                </div>
               </Link>
               <div className="flex flex-col gap-3">
                 <span className='flex gap-2 items-center'><FaMapMarkerAlt/><p className="text-sm line-clamp-1">{ad.address}</p></span>

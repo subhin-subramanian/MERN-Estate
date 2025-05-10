@@ -32,18 +32,34 @@ export const getAds = async(req,res)=>{
       const startIndex = parseInt(req.query.startIndex) || 0;
       const limit = parseInt(req.query.limit) || 9;
       const sortDirection = req.query.order === 'asc'?1:-1;
-      const ads = await addsPosted.find({
-        ...(req.query.userId && {userId:req.query.userId}),
-        ...(req.query.type && {type:req.query.type}),
-        ...(req.query.bed && {bed:req.query.bed}),
-        ...(req.query.searchTerm && {
-            $or:[
-                {title:{$regex:req.query.searchTerm,$options:'i'}},
-                {content:{$regex:req.query.searchTerm,$options:'i'}}
-            ]
-        })
-      }).sort({updatedAt:sortDirection}).skip(startIndex).limit(limit);
 
+      //   Filters from query
+      const filters=[];
+      if(req.query.userId) filters.push({userId:req.query.userId});
+      if(req.query.type) filters.push({type:req.query.type});
+      if(req.query.furnished) filters.push({furnished:req.query.furnished});
+      if(req.query.parking) filters.push({parking:req.query.parking});
+      if(req.query.bed) filters.push({bed:{ $gte: parseInt(req.query.bed) }});
+      if(req.query.bath) filters.push({bath:{$gte: parseInt(req.query.bath)}});
+      if(req.query.type === 'rent' && req.query.rent){
+        filters.push({rent:{$lte: parseInt(req.query.rent)}});
+      }
+      if(req.query.type === 'sale' && req.query.sellingPrice){
+        filters.push({sellingPrice:{$lte: parseInt(req.query.sellingPrice)}});
+      }
+      if (req.query.searchTerm) {
+        filters.push({
+          $or: [
+            { description: { $regex: req.query.searchTerm, $options: 'i' } },
+            { address: { $regex: req.query.searchTerm, $options: 'i' } }
+          ]
+        });
+      }
+
+      // Final query object
+      const query = filters.length ? {$and:filters}:{};   
+    
+      const ads = await addsPosted.find(query).sort({updatedAt:sortDirection}).skip(startIndex).limit(limit);
       const totalAds = await addsPosted.countDocuments();
       res.status(200).json({ads,totalAds});
     } catch (error) {
