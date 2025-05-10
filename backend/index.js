@@ -14,6 +14,9 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// For rendering
+const __rendirname = path.resolve();
+
 dotenv.config();
 app.use(express.json());
 app.use(cookieParser());
@@ -35,3 +38,9 @@ app.listen(3000,()=>{
 app.use('/api/user',userRouter);
 app.use('/api/upload',uploadRouter);
 app.use('/api/adds',addsRouter);
+
+// For rendering
+app.use(express.static(path.join(__rendirname,'/frontend/dist')));
+app.get('/*name',(req,res)=>{
+    res.sendFile(path.join(__rendirname,'frontend','dist','index.html'));
+});

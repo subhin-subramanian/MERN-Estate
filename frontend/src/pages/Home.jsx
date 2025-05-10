@@ -61,6 +61,11 @@ function Home() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
         <h1 className='absolute inset-0 flex items-center justify-center text-white font-bold text-xl font-serif tracking-wider'><i>"NB: This is a demo site. But you can signup and check out the features of my app. For works go to subhinms.com"</i></h1>
       </div>
+
+      {/* About */}
+      <p className='px-10 py-15 text-xl font-serif leading-loose font-semibold'>Welcome to 1 cent properties, your all-in-one platform for discovering, buying, renting, and listing real estate properties — built for speed, simplicity, and clarity.
+      Our platform is designed to connect buyers, renters, and sellers with ease. Whether you're looking for a furnished rental, a budget-friendly apartment, or your dream home, we offer powerful filters and intuitive search tools to help you find exactly what you need.<br/>
+      This app is built using the MERN stack — MongoDB, Express.js, React, and Node.js — making it fast, scalable, and user-friendly. Whether you're casually browsing or actively house hunting, our app provides a smooth, efficient experience from start to finish.</p>
       {/* Ad cards section */}
 
       <div className="flex items-center justify-center py-5 gap-10">
