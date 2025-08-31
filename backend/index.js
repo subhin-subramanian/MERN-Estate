@@ -1,28 +1,30 @@
-import express from 'express';
+import express, { urlencoded } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import userRouter from './routes/user.routes.js';
-import { fileURLToPath } from 'url';
-import path, { dirname } from 'path';
+import path from 'path';
+import { fileURLToPath } from "url";
 import cookieParser from 'cookie-parser';
-import cors from 'cors';
 import uploadRouter from './routes/upload.route.js';
 import addsRouter from './routes/adds.route.js';
+import cors from 'cors';
+
+dotenv.config(); //Loading environment variables
 
 const app = express();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 // For rendering
 const __rendirname = path.resolve();
 
-dotenv.config();
-app.use(express.json());
+// Needed to get __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+//Middlewares
+app.use(express.json({limit:"10mb"}));
 app.use(cookieParser());
 app.use(cors());
-// Serving uploaded images statically
-app.use('/uploads',express.static(path.join(__dirname,'uploads')));
+app.use(express.urlencoded({extended:true}));
 
 // Database connection
 mongoose.connect(process.env.MONGO).then(()=>{

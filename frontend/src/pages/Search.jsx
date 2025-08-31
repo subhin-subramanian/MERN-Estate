@@ -153,7 +153,9 @@ function Search() {
             <AdCard key={ad._id} ad={ad}/>
           ))}
         </div>
-        <span className='font-semibold text-center p-3 hover:underline' onClick={handleShowMore}>Show More</span>
+        {showMore && (
+          <span className='font-semibold text-center p-3 hover:underline' onClick={handleShowMore}>Show More</span>
+        )}
       </div>
 
     </div>

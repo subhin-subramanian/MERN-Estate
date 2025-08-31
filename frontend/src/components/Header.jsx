@@ -141,7 +141,7 @@ function Header() {
         <span className='text-xl sm:text-3xl font-bold flex gap-2 bg-amber-950 text-white whitespace-nowrap font-serif p-2 items-center rounded-full shadow-md'><span className='bg-white text-black rounded-full p-2'>1</span>Cent<span className='font-semibold'><i>Property</i></span></span>
       </Link>
 
-      <form className='className="mt-5 mx-auto order-2 md:mt-0 md:order-0 flex relative w-full md:max-w-96 max-w-4xl shadow-lg' onSubmit={handleSearchSubmit}>
+      <form className='mt-5 mx-auto order-2 md:mt-0 md:order-0 flex relative w-full md:max-w-96 max-w-4xl shadow-lg' onSubmit={handleSearchSubmit}>
         <input
         type="text"
         id="search"

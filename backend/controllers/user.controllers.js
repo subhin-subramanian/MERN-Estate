@@ -53,7 +53,7 @@ export const signIn = async(req,res)=>{
 
 // Function for the backend of user update
 export const update = async(req,res)=>{
-    if(req.user.id !==req.params.userId){
+    if(req.user.id !== req.params.userId){
         return res.status(401).json("You're not allowed to update this user");
     }
     req.body.password = bcryptjs.hashSync(req.body.password,10);

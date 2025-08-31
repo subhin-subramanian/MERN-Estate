@@ -10,7 +10,7 @@ function FooterComp() {
         <Link to={'/'}>
           <span className='max-w-52 sm:max-w-72 text-xl sm:text-3xl font-bold flex gap-2 bg-amber-950 text-white whitespace-nowrap font-serif p-2 items-center rounded-full shadow-md'><span className='bg-white text-black rounded-full p-2'>1</span>Cent<span className='font-semibold'><i>Property</i></span></span>
         </Link>
-        <Link to={'/post-add'}>
+        <Link to={'/create-add'}>
           <Button className='bg-gradient-to-r from-amber-600 to-amber-400'>Want to Advertise in our site -- Click Here</Button>
         </Link>
       </div>

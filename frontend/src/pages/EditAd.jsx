@@ -45,56 +45,66 @@ function EditAd() {
     }
   }
   
-    // Function to store formdata while entering
-    const handleChange=(event)=>{setFormdata({...formdata,[event.target.id]:event.target.value})}
+  // Function to store formdata while entering
+  const handleChange=(event)=>{setFormdata({...formdata,[event.target.id]:event.target.value})}
 
-    // Function to store data from checkboxes clicking
-    const handleCheckboxes =(event)=>{setFormdata({...formdata,[event.target.id]:event.target.checked})}
+  // Function to store data from checkboxes clicking
+  const handleCheckboxes =(event)=>{setFormdata({...formdata,[event.target.id]:event.target.checked})}
 
-    // Function to handle image upload to backend and sotre the  url from backend to formdata
-    const handleImageChange = async(event)=>{
-        setImageError(null);
-        const file = event.target.files[0];
-        if(!file) return;
-        if(file.size > (2*1024*1024)){
-            return setImageError("Image size must be less than 2mb");
-        }
-        // Uploading image to backend
-        const imageFile = new FormData();
-        imageFile.append('image',file);
+  // Function to handle image upload to backend and sotre the  url from backend to formdata
+  const handleImageChange = async(event)=>{
+      setImageError(null);
+      const file = event.target.files[0];
+      if(!file) return;
+      if(file.size > (2*1024*1024)){
+          return setImageError("Image size must be less than 2mb");
+      }
+      // Uploading image to cloudinary
+      const reader = new FileReader();
+      reader.onloadend = async()=>{
+        const base64String = reader.result;
         try {
-            const res = await fetch('/api/upload',{method:'POST',body:imageFile});
+            const res = await fetch('/api/upload',{
+              method:'POST',
+              headers: {'Content-Type':'application/json'},
+              body:JSON.stringify({image:base64String})
+            });
             const data = await res.json();
+            if(!res.ok) return setImageError(data.message);
             if(data.imageUrl){
                 setFormdata({...formdata,coverImg:data.imageUrl});  
             }
         } catch (error) {
             setImageError('Upload failed' +error);
         }   
-    }
-
-    // Function to store submit an add request to database
-    const handleSubmit = async(event)=>{
-      event.preventDefault();
-      setFormError(null);
-      setLoading(true);
-      try {
-        const res = await fetch(`/api/adds/edit/${adId}`,{
-          method:'PUT',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify(formdata)
-        });
-        const data = await res.json();
-        if(!res.ok){
-          return setFormError(data.message);
-        }
-        setLoading(false);
-        navigate('/',{state:{message:"Ad edited"}});
-      } catch (error) {
-        setFormError(error.message);
-        setLoading(false);
       }
+      if(file){
+        reader.readAsDataURL(file);
+      }
+  }
+  
+  // Function to store submit an add request to database
+  const handleSubmit = async(event)=>{
+    event.preventDefault();
+    setFormError(null);
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/adds/edit/${adId}`,{
+        method:'PUT',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(formdata)
+      });
+      const data = await res.json();
+      if(!res.ok){
+        return setFormError(data.message);
+      }
+      setLoading(false);
+      navigate('/',{state:{message:"Ad edited"}});
+    } catch (error) {
+      setFormError(error.message);
+      setLoading(false);
     }
+  }
 
   return (
     <div>

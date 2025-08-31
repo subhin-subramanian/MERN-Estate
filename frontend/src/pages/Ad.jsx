@@ -92,7 +92,7 @@ function Ad() {
           </div>
 
           <div className="flex items-center gap-2 mt-">
-            <FaPhone/><span className="text-sm font-semibold sm:text-2xl"></span>
+            <FaPhone/><span className="text-sm font-semibold sm:text-xl">{ad.phone}</span>
           </div>
           
         </div>

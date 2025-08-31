@@ -33,19 +33,28 @@ function Profile() {
         if(file.size > (2*1024*1024)){
             return setImageError("Image size must be less than 2mb");
         }
-        // Uploading image to backend
-        const imageFile = new FormData();
-        imageFile.append('image',file);
-        try {
-            const res = await fetch('/api/upload',{method:'POST',body:imageFile});
-            const data = await res.json();
-            if(data.imageUrl){
-                setFormdata({...formdata,profilePic:data.imageUrl});
-                console.log(formdata);
-                
+        // Uploading image to cloudinary
+        const reader = new FileReader();
+        reader.onloadend = async ()=>{
+            const base64String = reader.result;
+            try {
+                const res = await fetch('/api/upload',{
+                    method:'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body:JSON.stringify({image:base64String})
+                });
+                const data = await res.json();
+                if(!res.ok) return setImageError(data.message);
+                if(data.imageUrl){
+                    setFormdata({...formdata,profilePic:data.imageUrl});
+                    console.log(formdata);               
+                }
+            } catch (error) {
+                setImageError('Upload failed' +error);
             }
-        } catch (error) {
-            setImageError('Upload failed' +error);
+        }
+        if(file){
+          reader.readAsDataURL(file);
         }
     }
 
@@ -128,7 +137,7 @@ function Profile() {
     if(currentUser && currentUser.isAdmin){
       fetchAds();
     }
-  },[currentUser])
+  },[currentUser,ads])
 
   // Function to delete an ad
   const handleAdDelete = async(adId)=>{
@@ -159,7 +168,7 @@ function Profile() {
         </div>  
 
         {updateStatus && <Alert color='success' className='mt-5'>{updateStatus}</Alert>}
-        {error && <Alert color='failure' className='mt-5'>{error.message}</Alert>}
+        {imageError && <Alert color='failure' className='mt-5'>{imageError}</Alert>}
 
         <Button className='w-40 mx-auto bg-gradient-to-r from-amber-800 to-amber-300 hover:opacity-85' onClick={()=>fileRef.current.click()}>Change Image</Button>
 
@@ -171,6 +180,8 @@ function Profile() {
         <Button className='bg-gradient-to-r from-amber-300 to-amber-800 hover:opacity-85' type='submit'>
           {loading ? <><Spinner size='sm'/><span>Loading...</span></> : 'Update'}</Button>    
       </form>
+
+      {error && <Alert color='failure' className='mt-5'>{error.message}</Alert>}
 
       <div className="text-red-600 flex justify-center gap-55 mt-2 text-sm font-semibold dark:text-red-300">
         <span className='cursor-pointer' onClick={()=>setShowModal(true)}>Delete Account?</span>

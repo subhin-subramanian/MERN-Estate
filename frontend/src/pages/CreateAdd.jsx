@@ -38,18 +38,26 @@ function CreateAdd() {
     if(file.size > (2*1024*1024)){
         return setImageError("Image size must be less than 2mb");
     }
-    // Uploading image to backend
-    const imageFile = new FormData();
-    imageFile.append('image',file);
-    try {
-        const res = await fetch('/api/upload',{method:'POST',body:imageFile});
+    // Uploading image to cloudinary
+    const reader = new FileReader();
+    reader.onloadend = async()=>{
+      const base64String = reader.result;
+      try {
+        const res =  await fetch('/api/upload',{
+          method:'POST',
+          headers: {'Content-Type':'application/json'},
+          body:JSON.stringify({image:base64String})});
         const data = await res.json();
         if(data.imageUrl){
             setFormdata({...formdata,coverImg:data.imageUrl});  
         }
-    } catch (error) {
-        setImageError('Upload failed' +error);
-    }   
+      } catch (error) {
+          setImageError('Upload failed' +error);
+      }   
+    }
+    if(file){
+      reader.readAsDataURL(file);
+    }    
   }
 
   // Function to store submit an add request to database
