@@ -12,7 +12,7 @@ import cors from 'cors';
 const app = express();
 
 // For rendering
-// const __rendirname = path.resolve();
+const __rendirname = path.resolve();
 
 // Needed to get __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -33,10 +33,10 @@ app.use('/api/upload',uploadRouter);
 app.use('/api/adds',addsRouter);
 
 // For rendering
-// app.use(express.static(path.join(__rendirname,'/frontend/dist')));
-// app.get('/*name',(req,res)=>{
-//     res.sendFile(path.join(__rendirname,'frontend','dist','index.html'));
-// });
+app.use(express.static(path.join(__rendirname,'/frontend/dist')));
+app.get('/*name',(req,res)=>{
+    res.sendFile(path.join(__rendirname,'frontend','dist','index.html'));
+});
 
 // Database connection
 mongoose.connect(process.env.MONGO).then(()=>{
