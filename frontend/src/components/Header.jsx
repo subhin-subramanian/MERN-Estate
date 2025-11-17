@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { signInFailure, signInStart, signInSuccess, signOutFailure, signOutStart, signOutSuccess } from '../redux/userSlice';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { toggleTheme } from '../redux/themeSlice';
+import { GoogleLogin } from '@react-oauth/google';
 
 function Header() {
 
@@ -72,7 +73,40 @@ function Header() {
     }
   }
 
-  // Function to handle singing in
+  // Function for google Sign-Up
+  const handleGoogleSignup = async(credentialResponse)=>{
+    setsignupError(null);
+    setLoading(true);
+    if(!signupData.password || signupData.password==='' || !signupData.phone || signupData.phone===''){
+      return setsignupError("You should enter the password and phone, even if signingup with google-account");
+    }
+    if(signupData.phone.length <10){
+      return setsignupError('Please enter a valid phone no.')
+    }
+    try {
+      const res = await fetch('/api/user/google/sign-up',{
+        method: "POST",
+        headers:{'Content-Type': 'application/json'},
+        body:JSON.stringify({token:credentialResponse.credential,signupData})
+      });
+      const data = await res.json();
+      if(!res.ok){
+        setsignupError(data.message);
+        return;
+      }
+      setLoading(false)
+      setShowSignup(false);
+      setAuthStat('Signup Successfull, now sign-in with your details');
+      setTimeout(() => {
+        setAuthStat(null);
+      }, 5000);
+    } catch (error) {
+      setsignupError(error.message);
+      setLoading(false);
+    }
+  }
+
+  // Function to handle signing in
   const handleSignin = async(e)=>{
     e.preventDefault();
     dispatch(signInStart());
@@ -81,6 +115,34 @@ function Header() {
         method: "POST",
         headers:{'Content-Type': 'application/json'},
         body:JSON.stringify(signinData)
+      });
+      const data = await res.json();
+      if(!res.ok){
+        dispatch(signInFailure(data.message));
+        return;
+      }
+      dispatch(signInSuccess(data.rest));
+      setShowSignin(false);
+      setAuthStat('Successfully signed in');
+      setTimeout(() => {
+        setAuthStat(null);
+      }, 5000);
+    } catch (error) {
+      dispatch(signInFailure(error.message));
+    }
+  }
+
+  // Function to handle google sign in 
+  const handleGoogleSignin = async(credentialResponse)=>{
+    if(!signinData.password){
+      return dispatch(signInFailure('Password is required'));
+    }
+    dispatch(signInStart());
+    try {
+      const res = await fetch('/api/user/google/sign-in',{
+        method: "POST",
+        headers:{'Content-Type': 'application/json'},
+        body:JSON.stringify({token:credentialResponse.credential,password:signinData.password})
       });
       const data = await res.json();
       if(!res.ok){
@@ -204,7 +266,13 @@ function Header() {
           <>
            <Spinner size='sm'/>
            <span>Loading...</span>
-          </>:'Sign Up'}</Button>
+          </>:'Sign Up'}
+        </Button>
+
+        <GoogleLogin   text="signup_with" onSuccess={handleGoogleSignup} onError={() => {
+              console.log("Google Login Failed")
+              setsignupError("Something went wrong on google login")}} /> 
+        
         <div className="flex pt-0 gap-2 py-5 items-center">
           <span className='text-sm font-semibold'>Already have an account.</span>
           <span className='text-blue-700 cursor-pointer font-semibold hover:underline' onClick={()=>{setShowSignup(false);setShowSignin(true)}}>SignIn</span>
@@ -227,12 +295,19 @@ function Header() {
           <Label className='ml-0.5'>Password</Label>
           <TextInput placeholder='********' type='password' id='password' required onChange={handleSigninChange}/>
         </div>
+        
         <Button className='bg-amber-950 hover:bg-amber-950 hover:opacity-90' onClick={handleSignin}  disabled={signinLoading}>
           {signinLoading ? 
           <>
            <Spinner size='sm'/>
            <span>Loading...</span>
-          </>:'Sign In'}</Button>
+          </>:'Sign In'}
+        </Button>
+
+        <GoogleLogin onSuccess={handleGoogleSignin} onError={() => {
+              console.log("Google Login Failed")
+              dispatch(signInFailure('Google Sign-in Failed'));}} /> 
+
         <div className="flex pt-0 gap-2 py-5 items-center">
           <span className='text-sm font-semibold'>Don't have an account.</span>
           <span className='text-blue-700 cursor-pointer font-semibold hover:underline' onClick={()=>{setShowSignup(true);setShowSignin(false)}}>Create-Account</span>
